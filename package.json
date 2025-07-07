@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/pg": "^8.15.4"
+  },
+  "dependencies": {
+    "react-masonry-css": "^1.0.16"
+  }
+}
