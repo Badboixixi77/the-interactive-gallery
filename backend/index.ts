@@ -11,7 +11,10 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://the-interactive-gallery-j2aa.vercel.app'
+
+}));
 app.use(express.json());
 
 // PostgreSQL connection
