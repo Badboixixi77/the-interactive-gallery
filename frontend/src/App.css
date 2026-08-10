@@ -669,3 +669,253 @@
   color: #1a1a1a;
   margin: 0 0 24px;
 }
+
+/* ========================================
+   Mobile Responsive
+   ======================================== */
+
+/* Hamburger Button - hidden on desktop */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 110;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #333;
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.hamburger-btn.hamburger-active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn.hamburger-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.hamburger-active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Menu Dropdown */
+.mobile-menu {
+  display: none;
+}
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+
+  .navbar {
+    padding: 12px 16px;
+    flex-wrap: nowrap;
+  }
+
+  .navbar-title {
+    font-size: 17px;
+  }
+
+  .navbar-icon {
+    font-size: 20px;
+  }
+
+  /* Hide desktop search and favorites */
+  .navbar-search {
+    display: none;
+  }
+
+  .navbar-favorites {
+    display: none;
+  }
+
+  /* Show hamburger */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Mobile menu panel */
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 16px;
+    border-bottom: 1px solid #eaeaea;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    z-index: 105;
+    animation: slideDown 0.25s ease;
+  }
+
+  .mobile-menu-search {
+    width: 100%;
+  }
+
+  .mobile-menu-search .navbar-search-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-menu-fav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+
+  .mobile-menu-fav:hover {
+    background: #f5f5f5;
+  }
+
+  .comment-section {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Small screens: 600px and below */
+@media (max-width: 600px) {
+  .comment-form {
+    flex-direction: column;
+  }
+
+  .comment-form input {
+    width: 100%;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .comment-form button {
+    width: 100%;
+  }
+
+  .lightbox-image {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  .lightbox-close {
+    top: 12px;
+    right: 12px;
+    font-size: 40px;
+    padding: 8px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Extra small: 500px and below */
+@media (max-width: 500px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    justify-content: center;
+  }
+
+  .load-more-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+
+  .heart-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+
+  .skeleton-detail-image {
+    height: 260px;
+  }
+}
+
+/* Detail page mobile: 480px and below */
+@media (max-width: 480px) {
+  .detail-title {
+    font-size: 20px;
+  }
+
+  .detail-back-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .detail-author {
+    font-size: 14px;
+  }
+
+  .detail-tags {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .detail-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+
+  .empty-state {
+    padding: 48px 16px;
+  }
+
+  .empty-state-icon {
+    font-size: 48px;
+  }
+}
+
+/* Disable sticky sidebar on mobile */
+@media (max-width: 900px) {
+  .detail-sidebar {
+    position: static;
+  }
+
+  .detail-layout {
+    gap: 20px;
+  }
+}
