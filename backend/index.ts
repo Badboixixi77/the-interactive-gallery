@@ -11,11 +11,29 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
+// CORS origins — supports local dev, Vercel, and Render deployments
+const allowedOrigins: (string | RegExp)[] = [
+  'http://localhost:3000',
+  'https://the-interactive-gallery-j2aa.vercel.app',
+];
+
+// Add Render frontend URL if set via environment variable
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(`https://${process.env.FRONTEND_URL}`);
+}
+
 app.use(cors({
-  origin: [
-    'https://the-interactive-gallery-j2aa.vercel.app',
-    'http://localhost:3000'
-  ]
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., Postman, curl, server-to-server)
+    if (!origin || allowedOrigins.some(o => {
+      if (typeof o === 'string') return o === origin;
+      return o.test(origin);
+    })) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
 app.use(express.json());
 
