@@ -12,7 +12,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const sortedComments = [...comments].sort((a, b) => {
+    const da = new Date(a.created_at).getTime();
+    const db = new Date(b.created_at).getTime();
+    return sortOrder === 'newest' ? db - da : da - db;
+  });
 
   const loadComments = async () => {
     setLoading(true);
@@ -50,15 +57,27 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
 
   return (
     <div className="comment-section">
-      <h3>Comments</h3>
+      <h3>Comments ({comments.length})</h3>
+      {comments.length > 0 && (
+        <div className="sort-toggle">
+          <button
+            className={`sort-btn ${sortOrder === 'newest' ? 'sort-active' : ''}`}
+            onClick={() => setSortOrder('newest')}
+          >Newest</button>
+          <button
+            className={`sort-btn ${sortOrder === 'oldest' ? 'sort-active' : ''}`}
+            onClick={() => setSortOrder('oldest')}
+          >Oldest</button>
+        </div>
+      )}
       {loading ? (
         <div style={{ color: '#999' }}>Loading comments...</div>
       ) : (
         <ul className="comment-list">
-          {comments.length === 0 && (
+          {sortedComments.length === 0 && (
             <li style={{ color: '#999', paddingBottom: 12 }}>No comments yet. Be the first!</li>
           )}
-          {comments.map((c) => (
+          {sortedComments.map((c) => (
             <li key={c.id} className="comment-item">
               <div className="comment-author">{c.author}</div>
               <div className="comment-text">{c.text}</div>

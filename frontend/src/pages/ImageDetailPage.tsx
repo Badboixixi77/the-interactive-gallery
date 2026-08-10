@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchImageDetails } from '../services/unsplashService';
 import CommentSection from '../components/CommentSection';
+import Lightbox from '../components/Lightbox';
 
 const ImageDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     const loadImage = async () => {
@@ -51,8 +53,11 @@ const ImageDetailPage: React.FC = () => {
       <div className="detail-layout">
         <div className="detail-image-wrapper">
           <img
+            className="detail-image-clickable"
             src={image.urls?.regular}
             alt={image.alt_description || image.description || 'Image'}
+            onClick={() => setLightboxOpen(true)}
+            title="Click to view full size"
           />
         </div>
 
@@ -73,6 +78,14 @@ const ImageDetailPage: React.FC = () => {
           <CommentSection imageId={id!} />
         </div>
       </div>
+
+      {lightboxOpen && (
+        <Lightbox
+          src={image.urls?.full || image.urls?.regular}
+          alt={image.alt_description || image.description || 'Image'}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 };
