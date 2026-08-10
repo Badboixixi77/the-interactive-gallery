@@ -7,16 +7,18 @@ interface ImageCardProps {
 
 const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="image-card">
       <Link to={`/image/${image.id}`}>
         <img
           src={image.urls.small}
-          alt={image.alt_description}
-          style={{ width: '100%', borderRadius: 8, display: 'block' }}
+          alt={image.alt_description || 'Gallery image'}
         />
+        <div className="image-card-overlay">
+          {image.user?.name || 'Unknown photographer'}
+        </div>
       </Link>
     </div>
   );
 };
 
-export default ImageCard; 
+export default ImageCard;

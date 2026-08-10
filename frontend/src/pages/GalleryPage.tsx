@@ -21,10 +21,19 @@ const GalleryPage: React.FC = () => {
     loadImages();
   }, []);
 
-  if (loading) return <div>Loading images...</div>;
-  if (error) return <div>{error}</div>;
+  if (error) return <div style={{ textAlign: 'center', padding: 40, color: '#e74c3c' }}>{error}</div>;
+
+  if (loading) {
+    return (
+      <div className="skeleton-grid">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="skeleton skeleton-card" />
+        ))}
+      </div>
+    );
+  }
 
   return <Gallery images={images} />;
 };
 
-export default GalleryPage; 
+export default GalleryPage;

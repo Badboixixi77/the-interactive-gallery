@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { fetchImageDetails } from '../services/unsplashService';
 import CommentSection from '../components/CommentSection';
 
@@ -25,23 +25,56 @@ const ImageDetailPage: React.FC = () => {
     loadImage();
   }, [id]);
 
-  if (loading) return <div>Loading image...</div>;
-  if (error) return <div>{error}</div>;
-  if (!image) return <div>Image not found</div>;
+  if (error) return <div style={{ textAlign: 'center', padding: 40, color: '#e74c3c' }}>{error}</div>;
+
+  if (loading) {
+    return (
+      <div className="detail-page">
+        <Link to="/" className="detail-back-btn">&larr; Back to Gallery</Link>
+        <div className="detail-layout">
+          <div className="skeleton skeleton-detail-image" />
+          <div>
+            <div className="skeleton skeleton-detail-title" />
+            <div className="skeleton skeleton-detail-text" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!image) return <div style={{ textAlign: 'center', padding: 40 }}>Image not found</div>;
 
   return (
-    <div>
-      <img src={image.urls?.regular} alt={image.alt_description} style={{ maxWidth: '100%' }} />
-      <h2>{image.description || image.alt_description}</h2>
-      <p>By: {image.user?.name}</p>
-      <div>
-        {image.tags && image.tags.map((tag: any) => (
-          <span key={tag.title} style={{ marginRight: 8 }}>#{tag.title}</span>
-        ))}
+    <div className="detail-page fade-in">
+      <Link to="/" className="detail-back-btn">&larr; Back to Gallery</Link>
+
+      <div className="detail-layout">
+        <div className="detail-image-wrapper">
+          <img
+            src={image.urls?.regular}
+            alt={image.alt_description || image.description || 'Image'}
+          />
+        </div>
+
+        <div className="detail-sidebar">
+          <h1 className="detail-title">
+            {image.description || image.alt_description || 'Untitled'}
+          </h1>
+          <p className="detail-author">By {image.user?.name || 'Unknown'}</p>
+
+          {image.tags && image.tags.length > 0 && (
+            <div className="detail-tags">
+              {image.tags.map((tag: any) => (
+                <span key={tag.title} className="detail-tag">#{tag.title}</span>
+              ))}
+            </div>
+          )}
+
+          <CommentSection imageId={id!} />
+        </div>
       </div>
-      <CommentSection imageId={id!} />
     </div>
   );
 };
 
-export default ImageDetailPage; 
+export default ImageDetailPage;

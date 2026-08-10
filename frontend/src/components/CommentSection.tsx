@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchComments, postComment } from '../services/apiService';
+import Toast from './Toast';
 
 interface CommentSectionProps {
   imageId: string;
@@ -10,8 +11,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
   const [author, setAuthor] = useState('');
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const loadComments = async () => {
     setLoading(true);
@@ -19,7 +20,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
       const data = await fetchComments(imageId);
       setComments(data);
     } catch (err) {
-      setError('Failed to load comments');
+      setToast({ message: 'Failed to load comments', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -38,37 +39,41 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
       await postComment(imageId, author, text);
       setText('');
       setAuthor('');
+      setToast({ message: 'Comment posted!', type: 'success' });
       loadComments();
     } catch (err) {
-      setError('Failed to post comment');
+      setToast({ message: 'Failed to post comment', type: 'error' });
     } finally {
       setPosting(false);
     }
   };
 
   return (
-    <div style={{ marginTop: 32 }}>
+    <div className="comment-section">
       <h3>Comments</h3>
       {loading ? (
-        <div>Loading comments...</div>
+        <div style={{ color: '#999' }}>Loading comments...</div>
       ) : (
-        <ul style={{ padding: 0, listStyle: 'none' }}>
+        <ul className="comment-list">
+          {comments.length === 0 && (
+            <li style={{ color: '#999', paddingBottom: 12 }}>No comments yet. Be the first!</li>
+          )}
           {comments.map((c) => (
-            <li key={c.id} style={{ marginBottom: 12, borderBottom: '1px solid #eee', paddingBottom: 8 }}>
-              <strong>{c.author}</strong>: {c.text}
-              <div style={{ fontSize: 12, color: '#888' }}>{new Date(c.created_at).toLocaleString()}</div>
+            <li key={c.id} className="comment-item">
+              <div className="comment-author">{c.author}</div>
+              <div className="comment-text">{c.text}</div>
+              <div className="comment-date">{new Date(c.created_at).toLocaleString()}</div>
             </li>
           ))}
         </ul>
       )}
-      <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
+      <form className="comment-form" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Your name"
           value={author}
           onChange={e => setAuthor(e.target.value)}
           required
-          style={{ marginRight: 8 }}
         />
         <input
           type="text"
@@ -77,13 +82,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
           onChange={e => setText(e.target.value)}
           minLength={2}
           required
-          style={{ marginRight: 8, width: 200 }}
         />
-        <button type="submit" disabled={posting}>Post</button>
+        <button type="submit" disabled={posting}>{posting ? 'Posting...' : 'Post'}</button>
       </form>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
     </div>
   );
 };
 
-export default CommentSection; 
+export default CommentSection;

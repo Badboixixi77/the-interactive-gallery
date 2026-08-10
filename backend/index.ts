@@ -12,8 +12,10 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: 'https://the-interactive-gallery-j2aa.vercel.app'
-
+  origin: [
+    'https://the-interactive-gallery-j2aa.vercel.app',
+    'http://localhost:3000'
+  ]
 }));
 app.use(express.json());
 
