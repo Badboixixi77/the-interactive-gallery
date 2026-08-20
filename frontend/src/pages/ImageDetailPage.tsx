@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { fetchImageDetails } from '../services/unsplashService';
 import CommentSection from '../components/CommentSection';
 import Lightbox from '../components/Lightbox';
+import ShareButtons from '../components/ShareButtons';
+import { extractPalette } from '../utils/colorExtractor';
 
 const ImageDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,6 +12,8 @@ const ImageDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [palette, setPalette] = useState<string[]>([]);
+  const [downloaded, setDownloaded] = useState(false);
 
   useEffect(() => {
     const loadImage = async () => {
@@ -17,6 +21,10 @@ const ImageDetailPage: React.FC = () => {
         if (id) {
           const data = await fetchImageDetails(id);
           setImage(data);
+          // Extract color palette from the image
+          if (data.urls?.small) {
+            extractPalette(data.urls.small).then(setPalette);
+          }
         }
       } catch (err) {
         setError('Failed to load image details');
@@ -26,6 +34,27 @@ const ImageDetailPage: React.FC = () => {
     };
     loadImage();
   }, [id]);
+
+  const handleDownload = async () => {
+    if (!image?.urls?.full) return;
+    try {
+      setDownloaded(true);
+      const response = await fetch(image.urls.full);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${image.id || 'image'}-unsplash.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setTimeout(() => setDownloaded(false), 2000);
+    } catch {
+      window.open(image.urls.full, '_blank');
+      setTimeout(() => setDownloaded(false), 2000);
+    }
+  };
 
   if (error) return <div className="error-message">{error}</div>;
 
@@ -67,7 +96,12 @@ const ImageDetailPage: React.FC = () => {
             {image.description || image.alt_description || 'Untitled'}
           </h1>
           <p className="detail-author">
-            Photograph by <strong>{image.user?.name || 'Unknown'}</strong>
+            Photograph by{' '}
+            <a href={image.user?.links?.html + '?utm_source=the-interactive-gallery&utm_medium=referral'} target="_blank" rel="noopener noreferrer">
+              <strong>{image.user?.name || 'Unknown'}</strong>
+            </a>{' '}
+            on{' '}
+            <a href="https://unsplash.com/?utm_source=the-interactive-gallery&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a>
           </p>
 
           {image.tags && image.tags.length > 0 && (
@@ -77,6 +111,34 @@ const ImageDetailPage: React.FC = () => {
               ))}
             </div>
           )}
+
+          {/* Color Palette */}
+          {palette.length > 0 && (
+            <div className="color-palette">
+              <span className="color-palette-label">Palette</span>
+              <div className="color-palette-swatches">
+                {palette.map((color) => (
+                  <div key={color} className="color-swatch" style={{ background: color }} title={color} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="detail-actions">
+            <button className="download-btn" onClick={handleDownload}>
+              {downloaded ? (
+                <><span className="download-icon">✓</span> Downloaded</>
+              ) : (
+                <><span className="download-icon">↓</span> Download HD</>
+              )}
+            </button>
+            <ShareButtons
+              imageUrl={image.urls?.regular || ''}
+              imageTitle={image.description || image.alt_description || 'Gallery Image'}
+              pageUrl={window.location.href}
+            />
+          </div>
 
           <CommentSection imageId={id!} />
         </div>

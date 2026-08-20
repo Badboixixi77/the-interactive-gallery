@@ -247,7 +247,7 @@
   box-shadow: var(--shadow-soft);
   margin-bottom: 20px;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .image-card::before {
@@ -272,7 +272,7 @@
 .image-card img {
   width: 100%;
   display: block;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .image-card:hover img {
@@ -335,6 +335,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  animation: fadeInUp 0.4s ease;
 }
 
 @media (max-width: 1100px) {
@@ -670,13 +671,13 @@
 
 /* Page Fade In */
 .fade-in {
-  animation: fadeIn 0.5s ease;
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -1120,5 +1121,182 @@
 
   .detail-layout {
     gap: 28px;
+  }
+}
+
+/* ===== QUICK WINS: Download, Share, Color Palette ===== */
+
+/* Detail Actions */
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Download Button */
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--color-dark);
+  color: #fff;
+  border: 1px solid var(--color-dark);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.download-btn:hover {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.download-icon {
+  font-size: 14px;
+}
+
+/* Share Buttons */
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.share-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.share-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.share-btn:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+  background: var(--color-bg-muted);
+  transform: translateY(-1px);
+}
+
+.share-btn-pinterest:hover {
+  border-color: #e60023;
+  color: #e60023;
+}
+
+.share-btn-copied {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+/* Color Palette */
+.color-palette {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.color-palette-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.color-palette-swatches {
+  display: flex;
+  gap: 6px;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.color-swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Detail Author Links */
+.detail-author a {
+  color: var(--color-accent-dark);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.detail-author a:hover {
+  color: var(--color-accent);
+}
+
+/* Staggered animation for gallery cards */
+.my-masonry-grid_column > div {
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.my-masonry-grid_column > div:nth-child(1) { animation-delay: 0ms; }
+.my-masonry-grid_column > div:nth-child(2) { animation-delay: 60ms; }
+.my-masonry-grid_column > div:nth-child(3) { animation-delay: 120ms; }
+.my-masonry-grid_column > div:nth-child(4) { animation-delay: 180ms; }
+.my-masonry-grid_column > div:nth-child(5) { animation-delay: 240ms; }
+.my-masonry-grid_column > div:nth-child(6) { animation-delay: 300ms; }
+
+/* Mobile adjustments for new features */
+@media (max-width: 768px) {
+  .detail-actions {
+    flex-wrap: wrap;
+  }
+
+  .download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .share-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .color-palette {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }

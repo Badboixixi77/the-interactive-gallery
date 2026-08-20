@@ -34,6 +34,7 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
+  scroll-behavior: smooth;
 }
 
 code {
@@ -52,4 +53,32 @@ a {
 ::selection {
   background: var(--color-accent-soft);
   color: var(--color-text);
+}
+
+/* Smooth scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
