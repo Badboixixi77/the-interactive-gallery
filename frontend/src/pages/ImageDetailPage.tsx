@@ -27,7 +27,7 @@ const ImageDetailPage: React.FC = () => {
     loadImage();
   }, [id]);
 
-  if (error) return <div style={{ textAlign: 'center', padding: 40, color: '#e74c3c' }}>{error}</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   if (loading) {
     return (
@@ -44,7 +44,7 @@ const ImageDetailPage: React.FC = () => {
     );
   }
 
-  if (!image) return <div style={{ textAlign: 'center', padding: 40 }}>Image not found</div>;
+  if (!image) return <div className="error-message">Image not found</div>;
 
   return (
     <div className="detail-page fade-in">
@@ -62,10 +62,13 @@ const ImageDetailPage: React.FC = () => {
         </div>
 
         <div className="detail-sidebar">
+          <p className="detail-eyebrow">Exhibition</p>
           <h1 className="detail-title">
             {image.description || image.alt_description || 'Untitled'}
           </h1>
-          <p className="detail-author">By {image.user?.name || 'Unknown'}</p>
+          <p className="detail-author">
+            Photograph by <strong>{image.user?.name || 'Unknown'}</strong>
+          </p>
 
           {image.tags && image.tags.length > 0 && (
             <div className="detail-tags">

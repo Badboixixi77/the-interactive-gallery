@@ -23,8 +23,11 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand" onClick={closeMenu}>
-        <span className="navbar-icon">🖼️</span>
-        <span className="navbar-title">The Interactive Gallery</span>
+        <span className="navbar-mark">IG</span>
+        <span>
+          <span className="navbar-title">The Interactive Gallery</span>
+          <span className="navbar-tagline">Fine Photography</span>
+        </span>
       </Link>
 
       <form className="navbar-search" onSubmit={handleSubmit}>
@@ -38,7 +41,7 @@ const Navbar: React.FC = () => {
       </form>
 
       <Link to="/favorites" className="navbar-favorites" onClick={closeMenu}>
-        ♥ Favorites
+        Favorites
         {count > 0 && <span className="fav-badge">{count}</span>}
       </Link>
 
@@ -63,7 +66,7 @@ const Navbar: React.FC = () => {
             />
           </form>
           <Link to="/favorites" className="mobile-menu-fav" onClick={closeMenu}>
-            ♥ Favorites {count > 0 && <span className="fav-badge">{count}</span>}
+            Favorites {count > 0 && <span className="fav-badge">{count}</span>}
           </Link>
         </div>
       )}

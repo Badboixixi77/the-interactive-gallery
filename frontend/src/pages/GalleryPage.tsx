@@ -51,7 +51,7 @@ const GalleryPage: React.FC = () => {
     loadImages(next, true);
   };
 
-  if (error) return <div style={{ textAlign: 'center', padding: 40, color: '#e74c3c' }}>{error}</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   if (loading) {
     return (
@@ -65,7 +65,20 @@ const GalleryPage: React.FC = () => {
 
   return (
     <div className="fade-in">
-      {query && <h2 className="page-title">Results for &ldquo;{query}&rdquo;</h2>}
+      {!query && (
+        <header className="gallery-hero">
+          <p className="gallery-hero-eyebrow">Curated Photography</p>
+          <h1 className="gallery-hero-title">The Interactive Gallery</h1>
+          <p className="gallery-hero-subtitle">
+            Discover exceptional imagery from the world&apos;s finest photographers
+          </p>
+        </header>
+      )}
+      {query && (
+        <h2 className="page-title">
+          Results for <span>&ldquo;{query}&rdquo;</span>
+        </h2>
+      )}
       {images.length === 0 ? (
         <div className="empty-state">
           <h2>No images found</h2>

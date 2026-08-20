@@ -41,15 +41,17 @@ const FavoritesPage: React.FC = () => {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">&#9825;</div>
-        <h2>No favorites yet</h2>
-        <p>Click the heart icon on any image to save it here.</p>
+        <h2>No saved works</h2>
+        <p>Select the heart on any photograph to begin your personal collection.</p>
       </div>
     );
   }
 
   return (
     <div className="fade-in">
-      <h2 className="page-title">Your Favorites ({images.length})</h2>
+      <h2 className="page-title">
+        Your Collection <span>({images.length})</span>
+      </h2>
       <Gallery images={images} />
     </div>
   );

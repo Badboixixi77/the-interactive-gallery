@@ -71,11 +71,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
         </div>
       )}
       {loading ? (
-        <div style={{ color: '#999' }}>Loading comments...</div>
+        <div className="comment-loading">Loading comments...</div>
       ) : (
         <ul className="comment-list">
           {sortedComments.length === 0 && (
-            <li style={{ color: '#999', paddingBottom: 12 }}>No comments yet. Be the first!</li>
+            <li className="comment-empty">No comments yet. Be the first to share your thoughts.</li>
           )}
           {sortedComments.map((c) => (
             <li key={c.id} className="comment-item">
