@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">🖼️ The Interactive Gallery</h1>
   <p align="center">
-    A full-stack interactive image gallery powered by Unsplash, where users can explore stunning photography and leave comments.
+    A premium full-stack photography discovery platform powered by Unsplash — explore, search, filter, favorite, download, and comment on stunning imagery.
   </p>
   <p align="center">
     <img src="https://img.shields.io/badge/React-19.1-blue?logo=react" alt="React" />
@@ -16,15 +16,37 @@
 
 ## ✨ Features
 
+### 🖼️ Gallery & Viewing
 - **Masonry Grid Gallery** — Responsive, Pinterest-style layout that adapts from 1 to 4 columns across breakpoints
 - **Unsplash Integration** — Fetches high-quality images directly from the Unsplash API
 - **Image Detail View** — Two-column layout with full image display, metadata, tags, and photographer attribution
-- **Comment System** — Post and view comments per image, backed by a persistent PostgreSQL database
-- **Toast Notifications** — Real-time success/error feedback for user actions
+- **Lightbox** — Full-screen image viewing with keyboard (Esc) and click-to-close support
 - **Loading Skeletons** — Animated shimmer placeholders that match the content layout
 - **Hover Effects** — Smooth card elevation, zoom, and photographer name overlay on hover
+
+### 🔍 Search & Discovery
+- **Autocomplete Search** — Debounced live suggestions as you type, with keyboard navigation (Arrow keys + Enter)
+- **Search Filters** — Filter results by orientation (landscape/portrait/square) and color (12 color swatches)
+- **Sorting** — Sort results by Relevance or Latest
+- **Result Counts** — Total result count displayed with search results
+- **Search History** — Recent searches saved locally, with one-click clear
+- **Trending Topics** — Curated topic chips on the homepage for instant exploration
+- **Keyboard Shortcut** — Press `/` anywhere to jump to search
+
+### ❤️ Engagement
+- **Favorites System** — Heart images to save them, with a dedicated Favorites page and nav badge
+- **Comment System** — Post and view comments per image, backed by a persistent PostgreSQL database, with newest/oldest sorting
+- **HD Downloads** — Download full-resolution images with proper Unsplash attribution
+- **Color Palette Extraction** — Automatically extracts the 5 dominant colors from any image
+- **Share Buttons** — Share to Twitter/X, Pinterest, or copy a direct link
+- **Toast Notifications** — Real-time success/error feedback for user actions
+
+### 💎 Design
+- **Premium Editorial Design** — Serif/sans-serif typography pairing, gallery-inspired aesthetic
+- **Mobile Responsive** — Hamburger menu, adaptive layouts, and touch-friendly controls
+- **Smooth Animations** — Staggered card entrances, page transitions, and micro-interactions
+- **Accessibility** — Reduced-motion support, semantic markup, keyboard navigation
 - **SPA Routing** — Seamless client-side navigation with React Router
-- **Dark Footer** — Professional footer with Unsplash attribution
 
 ---
 
@@ -56,17 +78,26 @@ the-interactive-gallery/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Gallery.tsx      # Masonry grid layout
-│   │   │   ├── ImageCard.tsx    # Individual image card with hover overlay
+│   │   │   ├── ImageCard.tsx    # Individual image card with hover overlay + favorite
 │   │   │   ├── CommentSection.tsx # Comment list + form with toast
-│   │   │   ├── Navbar.tsx       # Sticky navigation header
+│   │   │   ├── Navbar.tsx       # Sticky nav with autocomplete search + keyboard shortcut
+│   │   │   ├── FilterBar.tsx    # Search filters (orientation, color, sort)
+│   │   │   ├── Lightbox.tsx     # Full-screen image viewer
+│   │   │   ├── ShareButtons.tsx # Twitter/X, Pinterest, copy link
 │   │   │   ├── Footer.tsx       # Site footer
 │   │   │   └── Toast.tsx        # Auto-dismiss toast notification
 │   │   ├── pages/
-│   │   │   ├── GalleryPage.tsx  # Home page with skeleton loading
-│   │   │   └── ImageDetailPage.tsx # Detail page with back nav
+│   │   │   ├── GalleryPage.tsx  # Home page with trending topics + filters
+│   │   │   ├── ImageDetailPage.tsx # Detail page with download, palette, share
+│   │   │   └── FavoritesPage.tsx # Saved favorites gallery
+│   │   ├── hooks/
+│   │   │   ├── useFavorites.ts  # localStorage-backed favorites
+│   │   │   └── useSearchHistory.ts # localStorage-backed search history
 │   │   ├── services/
 │   │   │   ├── apiService.ts    # Backend comment API client
-│   │   │   └── unsplashService.ts # Unsplash API client
+│   │   │   └── unsplashService.ts # Unsplash API client (search, filters, topics)
+│   │   ├── utils/
+│   │   │   └── colorExtractor.ts # Canvas-based dominant color extraction
 │   │   ├── App.tsx              # Router + layout wrapper
 │   │   ├── App.css              # All component styles
 │   │   └── index.css            # Global styles + reset
@@ -145,6 +176,17 @@ npm run frontend
 ```
 
 The app will be available at **http://localhost:3000**.
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `/` | Focus the search bar |
+| `↑` / `↓` | Navigate search suggestions |
+| `Enter` | Select suggestion / submit search |
+| `Esc` | Close search dropdown or lightbox |
 
 ---
 
@@ -243,7 +285,9 @@ CREATE TABLE comments (
 
 | Gallery | Image Detail |
 |---|---|
-| Responsive masonry grid with hover overlays | Two-column layout with tags and comments |
+| Responsive masonry grid with trending topics and hover overlays | Two-column layout with palette, download, share, and comments |
+| **Search** | **Filters** |
+| Autocomplete dropdown with search history | Orientation, color, and sort filter bar |
 
 ---
 
