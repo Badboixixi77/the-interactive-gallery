@@ -16,6 +16,8 @@ services:
           property: connectionString
       - key: FRONTEND_URL
         sync: false
+      - key: JWT_SECRET
+        sync: false
 
   # Frontend (Static Site)
   - type: web

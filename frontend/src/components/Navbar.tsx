@@ -2,7 +2,9 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSearchHistory } from '../hooks/useSearchHistory';
+import { useAuth } from '../contexts/AuthContext';
 import { fetchSuggestions } from '../services/unsplashService';
+import AuthModal from './AuthModal';
 
 const Navbar: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -10,11 +12,14 @@ const Navbar: React.FC = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const navigate = useNavigate();
   const { count } = useFavorites();
   const { history, addToHistory, clearHistory } = useSearchHistory();
+  const { user, isAuthenticated, logout } = useAuth();
 
   // Keyboard shortcut: press "/" to focus search
   useEffect(() => {
@@ -191,6 +196,40 @@ const Navbar: React.FC = () => {
         {count > 0 && <span className="fav-badge">{count}</span>}
       </Link>
 
+      {/* Auth: user menu or sign in */}
+      {isAuthenticated && user ? (
+        <div className="user-menu">
+          <button
+            className="user-menu-btn"
+            onClick={() => setUserMenuOpen(prev => !prev)}
+            title={user.username}
+          >
+            <span className="user-avatar">{user.username.charAt(0).toUpperCase()}</span>
+          </button>
+          {userMenuOpen && (
+            <div className="user-menu-dropdown">
+              <div className="user-menu-info">
+                <span className="user-menu-name">{user.username}</span>
+                <span className="user-menu-email">{user.email}</span>
+              </div>
+              <button
+                className="user-menu-item"
+                onClick={() => {
+                  logout();
+                  setUserMenuOpen(false);
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button className="signin-btn" onClick={() => setAuthMode('login')}>
+          Sign In
+        </button>
+      )}
+
       <button
         className={`hamburger-btn ${menuOpen ? 'hamburger-active' : ''}`}
         onClick={() => setMenuOpen(prev => !prev)}
@@ -214,7 +253,23 @@ const Navbar: React.FC = () => {
           <Link to="/favorites" className="mobile-menu-fav" onClick={closeMenu}>
             Favorites {count > 0 && <span className="fav-badge">{count}</span>}
           </Link>
+          {!isAuthenticated && (
+            <button
+              className="mobile-menu-fav"
+              onClick={() => { setAuthMode('login'); closeMenu(); }}
+            >
+              Sign In
+            </button>
+          )}
         </div>
+      )}
+
+      {authMode && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setAuthMode(null)}
+          onSwitchMode={setAuthMode}
+        />
       )}
     </nav>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchComments, postComment } from '../services/apiService';
+import { fetchComments, postComment, deleteComment } from '../services/apiService';
+import { useAuth } from '../contexts/AuthContext';
 import Toast from './Toast';
 
 interface CommentSectionProps {
@@ -7,6 +8,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
+  const { user, isAuthenticated } = useAuth();
   const [comments, setComments] = useState<any[]>([]);
   const [author, setAuthor] = useState('');
   const [text, setText] = useState('');
@@ -40,10 +42,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.length < 2 || !author) return;
+    if (text.length < 2 || (!isAuthenticated && !author)) return;
     setPosting(true);
     try {
-      await postComment(imageId, author, text);
+      await postComment(imageId, isAuthenticated ? user!.username : author, text);
       setText('');
       setAuthor('');
       setToast({ message: 'Comment posted!', type: 'success' });
@@ -52,6 +54,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
       setToast({ message: 'Failed to post comment', type: 'error' });
     } finally {
       setPosting(false);
+    }
+  };
+
+  const handleDelete = async (commentId: number) => {
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      await deleteComment(commentId);
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      setToast({ message: 'Comment deleted', type: 'success' });
+    } catch (err) {
+      setToast({ message: 'Failed to delete comment', type: 'error' });
     }
   };
 
@@ -79,7 +92,18 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
           )}
           {sortedComments.map((c) => (
             <li key={c.id} className="comment-item">
-              <div className="comment-author">{c.author}</div>
+              <div className="comment-item-header">
+                <span className="comment-author">{c.author}</span>
+                {isAuthenticated && user && c.user_id === user.id && (
+                  <button
+                    className="comment-delete-btn"
+                    onClick={() => handleDelete(c.id)}
+                    title="Delete your comment"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
               <div className="comment-text">{c.text}</div>
               <div className="comment-date">{new Date(c.created_at).toLocaleString()}</div>
             </li>
@@ -87,13 +111,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ imageId }) => {
         </ul>
       )}
       <form className="comment-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={author}
-          onChange={e => setAuthor(e.target.value)}
-          required
-        />
+        {!isAuthenticated ? (
+          <input
+            type="text"
+            placeholder="Your name"
+            value={author}
+            onChange={e => setAuthor(e.target.value)}
+            required
+          />
+        ) : (
+          <span className="comment-form-user">Commenting as <strong>{user!.username}</strong></span>
+        )}
         <input
           type="text"
           placeholder="Add a comment..."
