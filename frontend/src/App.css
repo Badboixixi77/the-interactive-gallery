@@ -882,7 +882,7 @@
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
-  background: rgba(250, 248, 245, 0.92);
+  background: var(--color-bg-translucent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
@@ -890,6 +890,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
 .navbar-brand {
@@ -2267,4 +2268,90 @@
     padding: 6px 14px;
     font-size: 11px;
   }
+}
+
+/* Theme toggle button */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--color-accent-dark);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  transform: rotate(15deg);
+}
+
+/* ===== Dark theme refinements ===== */
+
+/* Primary dark buttons become gold in dark mode for contrast */
+[data-theme='dark'] .signin-btn,
+[data-theme='dark'] .auth-tab-active,
+[data-theme='dark'] .auth-submit,
+[data-theme='dark'] .filter-chip-active,
+[data-theme='dark'] .sort-btn.sort-active,
+[data-theme='dark'] .comment-form button {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #14120f;
+}
+
+[data-theme='dark'] .auth-submit:hover:not(:disabled) {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+  box-shadow: 0 6px 20px rgba(201, 168, 118, 0.25);
+}
+
+[data-theme='dark'] .signin-btn:hover {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+}
+
+/* Footer keeps its deep tone */
+[data-theme='dark'] .footer {
+  background: #0f0d0b;
+}
+
+/* Image cards look best with a subtle lifted border in dark mode */
+[data-theme='dark'] .image-card {
+  background: var(--color-bg-elevated);
+}
+
+/* Inputs in dark mode */
+[data-theme='dark'] .navbar-search-input,
+[data-theme='dark'] .auth-input-wrapper input,
+[data-theme='dark'] .comment-form input,
+[data-theme='dark'] .comment-form textarea {
+  background: var(--color-bg);
+}
+
+[data-theme='dark'] .navbar-search-input:focus,
+[data-theme='dark'] .auth-input-wrapper input:focus,
+[data-theme='dark'] .comment-form input:focus,
+[data-theme='dark'] .comment-form textarea:focus {
+  background: var(--color-bg-elevated);
+}
+
+/* Dropdowns and modals */
+[data-theme='dark'] .search-dropdown,
+[data-theme='dark'] .user-menu-dropdown,
+[data-theme='dark'] .mobile-menu {
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Auth visual panel mark stays legible */
+[data-theme='dark'] .auth-visual-mark {
+  background: rgba(0, 0, 0, 0.45);
 }

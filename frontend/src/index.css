@@ -1,5 +1,6 @@
 :root {
   --color-bg: #faf8f5;
+  --color-bg-translucent: rgba(250, 248, 245, 0.92);
   --color-bg-elevated: #ffffff;
   --color-bg-muted: #f0ebe3;
   --color-surface: #ffffff;
@@ -25,6 +26,30 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Dark theme overrides */
+[data-theme='dark'] {
+  --color-bg: #14120f;
+  --color-bg-translucent: rgba(20, 18, 15, 0.92);
+  --color-bg-elevated: #1e1b17;
+  --color-bg-muted: #26221d;
+  --color-surface: #1e1b17;
+  --color-border: #322d26;
+  --color-border-strong: #474034;
+  --color-text: #ece7df;
+  --color-text-muted: #a89e90;
+  --color-text-subtle: #78705f;
+  --color-accent: #c9a876;
+  --color-accent-dark: #d5b684;
+  --color-accent-soft: rgba(201, 168, 118, 0.14);
+  --color-dark: #0f0d0b;
+  --color-dark-muted: #2a2620;
+  --color-error: #c96a67;
+  --color-success: #6da57f;
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-frame: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -35,6 +60,7 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   scroll-behavior: smooth;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 code {

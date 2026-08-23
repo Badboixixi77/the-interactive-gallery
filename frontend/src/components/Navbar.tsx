@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSearchHistory } from '../hooks/useSearchHistory';
+import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchSuggestions } from '../services/unsplashService';
 import AuthModal from './AuthModal';
@@ -19,6 +20,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { count } = useFavorites();
   const { history, addToHistory, clearHistory } = useSearchHistory();
+  const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, logout } = useAuth();
 
   // Keyboard shortcut: press "/" to focus search
@@ -196,6 +198,32 @@ const Navbar: React.FC = () => {
         {count > 0 && <span className="fav-badge">{count}</span>}
       </Link>
 
+      {/* Theme toggle */}
+      <button
+        className="theme-toggle-btn"
+        onClick={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+      >
+        {theme === 'dark' ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        )}
+      </button>
+
       {/* Auth: user menu or sign in */}
       {isAuthenticated && user ? (
         <div className="user-menu">
@@ -253,6 +281,12 @@ const Navbar: React.FC = () => {
           <Link to="/favorites" className="mobile-menu-fav" onClick={closeMenu}>
             Favorites {count > 0 && <span className="fav-badge">{count}</span>}
           </Link>
+          <button
+            className="mobile-menu-fav"
+            onClick={() => { toggleTheme(); }}
+          >
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
           {!isAuthenticated && (
             <button
               className="mobile-menu-fav"
