@@ -82,6 +82,31 @@ async function initDatabase() {
       ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
     `);
 
+    // Collections table — named groups of favorite images per user
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS collections (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (user_id, name)
+      );
+    `);
+
+    // Images inside collections (denormalized display data from Unsplash)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS collection_images (
+        id SERIAL PRIMARY KEY,
+        collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+        image_id VARCHAR(100) NOT NULL,
+        image_url TEXT NOT NULL,
+        image_alt TEXT,
+        author_name VARCHAR(100),
+        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (collection_id, image_id)
+      );
+    `);
+
     console.log('Database tables are ready.');
   } catch (err) {
     console.error('Error initializing database:', err);
@@ -276,6 +301,157 @@ app.delete('/api/comments/:commentId', authMiddleware, async (req: AuthRequest, 
   } catch (err) {
     console.error('Error deleting comment:', err);
     res.status(500).json({ error: 'Failed to delete comment.' });
+  }
+});
+
+// ===== Collection routes =====
+
+// List the current user's collections (with image counts).
+// Optional ?imageId= flags which collections contain that image.
+app.get('/api/collections', authMiddleware, async (req: AuthRequest, res) => {
+  const { imageId } = req.query;
+  try {
+    const result = await pool.query(
+      `SELECT c.id, c.name, c.created_at, COUNT(ci.id)::int AS image_count
+       FROM collections c
+       LEFT JOIN collection_images ci ON ci.collection_id = c.id
+       WHERE c.user_id = $1
+       GROUP BY c.id
+       ORDER BY c.created_at DESC`,
+      [req.userId]
+    );
+    let contains: number[] = [];
+    if (imageId) {
+      const containsResult = await pool.query(
+        `SELECT ci.collection_id FROM collection_images ci
+         JOIN collections c ON c.id = ci.collection_id
+         WHERE c.user_id = $1 AND ci.image_id = $2`,
+        [req.userId, imageId]
+      );
+      contains = containsResult.rows.map(r => r.collection_id);
+    }
+    res.json({ collections: result.rows, contains });
+  } catch (err) {
+    console.error('Error fetching collections:', err);
+    res.status(500).json({ error: 'Failed to fetch collections.' });
+  }
+});
+
+// Get a single collection with its images (owner only)
+app.get('/api/collections/:collectionId', authMiddleware, async (req: AuthRequest, res) => {
+  const { collectionId } = req.params;
+  try {
+    const colResult = await pool.query(
+      'SELECT id, name, created_at FROM collections WHERE id = $1 AND user_id = $2',
+      [collectionId, req.userId]
+    );
+    if (colResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Collection not found.' });
+    }
+    const imagesResult = await pool.query(
+      'SELECT id, image_id, image_url, image_alt, author_name, added_at FROM collection_images WHERE collection_id = $1 ORDER BY added_at DESC',
+      [collectionId]
+    );
+    res.json({ collection: colResult.rows[0], images: imagesResult.rows });
+  } catch (err) {
+    console.error('Error fetching collection:', err);
+    res.status(500).json({ error: 'Failed to fetch collection.' });
+  }
+});
+
+// Create a collection
+app.post('/api/collections', authMiddleware, async (req: AuthRequest, res) => {
+  const { name } = req.body;
+  if (!name || name.trim().length < 1) {
+    return res.status(400).json({ error: 'Collection name is required.' });
+  }
+  if (name.trim().length > 100) {
+    return res.status(400).json({ error: 'Collection name is too long (max 100 chars).' });
+  }
+  try {
+    const result = await pool.query(
+      'INSERT INTO collections (user_id, name) VALUES ($1, $2) RETURNING id, name, created_at',
+      [req.userId, name.trim()]
+    );
+    res.status(201).json({ collection: result.rows[0] });
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      return res.status(409).json({ error: 'You already have a collection with that name.' });
+    }
+    console.error('Error creating collection:', err);
+    res.status(500).json({ error: 'Failed to create collection.' });
+  }
+});
+
+// Delete a collection (owner only)
+app.delete('/api/collections/:collectionId', authMiddleware, async (req: AuthRequest, res) => {
+  const { collectionId } = req.params;
+  try {
+    const result = await pool.query(
+      'DELETE FROM collections WHERE id = $1 AND user_id = $2 RETURNING id',
+      [collectionId, req.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Collection not found.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting collection:', err);
+    res.status(500).json({ error: 'Failed to delete collection.' });
+  }
+});
+
+// Add an image to a collection (owner only)
+app.post('/api/collections/:collectionId/images', authMiddleware, async (req: AuthRequest, res) => {
+  const { collectionId } = req.params;
+  const { image_id, image_url, image_alt, author_name } = req.body;
+  if (!image_id || !image_url) {
+    return res.status(400).json({ error: 'image_id and image_url are required.' });
+  }
+  try {
+    // Verify ownership first
+    const colResult = await pool.query(
+      'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
+      [collectionId, req.userId]
+    );
+    if (colResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Collection not found.' });
+    }
+    const result = await pool.query(
+      `INSERT INTO collection_images (collection_id, image_id, image_url, image_alt, author_name)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (collection_id, image_id) DO NOTHING
+       RETURNING id`,
+      [collectionId, image_id, image_url, image_alt || null, author_name || null]
+    );
+    if (result.rows.length === 0) {
+      return res.status(409).json({ error: 'Image is already in this collection.' });
+    }
+    res.status(201).json({ success: true });
+  } catch (err) {
+    console.error('Error adding image to collection:', err);
+    res.status(500).json({ error: 'Failed to add image to collection.' });
+  }
+});
+
+// Remove an image from a collection (owner only)
+app.delete('/api/collections/:collectionId/images/:imageId', authMiddleware, async (req: AuthRequest, res) => {
+  const { collectionId, imageId } = req.params;
+  try {
+    const result = await pool.query(
+      `DELETE FROM collection_images
+       WHERE collection_id = $1 AND image_id = $2
+         AND collection_id IN (SELECT id FROM collections WHERE user_id = $3)
+       RETURNING id`,
+      [collectionId, imageId, req.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Image not found in this collection.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error removing image from collection:', err);
+    res.status(500).json({ error: 'Failed to remove image from collection.' });
   }
 });
 

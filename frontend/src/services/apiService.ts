@@ -56,3 +56,71 @@ export const deleteComment = async (commentId: number) => {
   });
   return res.data;
 };
+
+// ===== Collections =====
+export interface Collection {
+  id: number;
+  name: string;
+  created_at: string;
+  image_count: number;
+}
+
+export interface CollectionImage {
+  id: number;
+  image_id: string;
+  image_url: string;
+  image_alt: string | null;
+  author_name: string | null;
+  added_at: string;
+}
+
+export const fetchCollections = async (imageId?: string) => {
+  const res = await axios.get(`${API_URL}/api/collections`, {
+    headers: authHeaders(),
+    params: imageId ? { imageId } : undefined,
+  });
+  return res.data as { collections: Collection[]; contains: number[] };
+};
+
+export const fetchCollection = async (collectionId: number) => {
+  const res = await axios.get(`${API_URL}/api/collections/${collectionId}`, {
+    headers: authHeaders(),
+  });
+  return res.data as { collection: Collection; images: CollectionImage[] };
+};
+
+export const createCollection = async (name: string) => {
+  const res = await axios.post(
+    `${API_URL}/api/collections`,
+    { name },
+    { headers: authHeaders() }
+  );
+  return res.data as { collection: Collection };
+};
+
+export const deleteCollection = async (collectionId: number) => {
+  const res = await axios.delete(`${API_URL}/api/collections/${collectionId}`, {
+    headers: authHeaders(),
+  });
+  return res.data;
+};
+
+export const addImageToCollection = async (
+  collectionId: number,
+  image: { image_id: string; image_url: string; image_alt?: string; author_name?: string }
+) => {
+  const res = await axios.post(
+    `${API_URL}/api/collections/${collectionId}/images`,
+    image,
+    { headers: authHeaders() }
+  );
+  return res.data;
+};
+
+export const removeImageFromCollection = async (collectionId: number, imageId: string) => {
+  const res = await axios.delete(
+    `${API_URL}/api/collections/${collectionId}/images/${imageId}`,
+    { headers: authHeaders() }
+  );
+  return res.data;
+};

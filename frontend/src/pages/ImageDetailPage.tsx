@@ -4,6 +4,7 @@ import { fetchImageDetails } from '../services/unsplashService';
 import CommentSection from '../components/CommentSection';
 import Lightbox from '../components/Lightbox';
 import ShareButtons from '../components/ShareButtons';
+import SaveToCollection from '../components/SaveToCollection';
 import { extractPalette } from '../utils/colorExtractor';
 
 const ImageDetailPage: React.FC = () => {
@@ -133,6 +134,12 @@ const ImageDetailPage: React.FC = () => {
                 <><span className="download-icon">↓</span> Download HD</>
               )}
             </button>
+            <SaveToCollection
+              imageId={image.id || id!}
+              imageUrl={image.urls?.regular || ''}
+              imageAlt={image.alt_description || image.description || undefined}
+              authorName={image.user?.name || undefined}
+            />
             <ShareButtons
               imageUrl={image.urls?.regular || ''}
               imageTitle={image.description || image.alt_description || 'Gallery Image'}
