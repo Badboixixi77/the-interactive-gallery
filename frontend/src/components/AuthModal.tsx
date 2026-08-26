@@ -101,8 +101,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onSwitchMode }) =>
 
         {/* Right: form panel */}
         <div className="auth-panel">
-          <button className="auth-close" onClick={onClose} aria-label="Close">&times;</button>
-
           {/* Mode tabs */}
           <div className="auth-tabs">
             <button
@@ -222,11 +220,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onSwitchMode }) =>
               )}
             </label>
 
-            <button type="submit" className="auth-submit" disabled={submitting}>
-              {submitting ? (
-                <span className="auth-spinner" />
-              ) : mode === 'login' ? 'Sign In' : 'Create Account'}
-            </button>
+            <div className="auth-actions">
+              <button type="submit" className="auth-submit" disabled={submitting}>
+                {submitting ? (
+                  <span className="auth-spinner" />
+                ) : mode === 'login' ? 'Sign In' : 'Create Account'}
+              </button>
+              <button type="button" className="auth-cancel" onClick={onClose} disabled={submitting}>
+                Cancel
+              </button>
+            </div>
           </form>
 
           <p className="auth-switch">
