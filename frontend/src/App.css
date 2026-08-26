@@ -337,9 +337,10 @@
   -webkit-backdrop-filter: blur(6px);
   z-index: 3000;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 48px 20px 40px;
+  overflow-y: auto;
   animation: fadeIn 0.25s ease;
 }
 
@@ -354,17 +355,18 @@
   border: 1px solid var(--color-border);
   box-shadow: 0 24px 80px rgba(28, 27, 24, 0.35);
   overflow: hidden;
-  animation: authModalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: authModalIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  margin-bottom: auto;
 }
 
 @keyframes authModalIn {
   from {
     opacity: 0;
-    transform: scale(0.97);
+    transform: translateY(-40px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -492,7 +494,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 44px 44px 36px;
+  padding: 64px 44px 36px;
   overflow-y: auto;
 }
 
@@ -854,7 +856,7 @@
   }
 
   .auth-panel {
-    padding: 36px 28px 28px;
+    padding: 48px 28px 28px;
   }
 }
 
