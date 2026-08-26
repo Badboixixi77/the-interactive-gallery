@@ -354,17 +354,17 @@
   border: 1px solid var(--color-border);
   box-shadow: 0 24px 80px rgba(28, 27, 24, 0.35);
   overflow: hidden;
-  animation: authModalIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: authModalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes authModalIn {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.98);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
 }
 
